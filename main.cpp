@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 #include "prim.h"
 // #include "recursiveBacktracking.h"
 // #include "dfsRecursive.h"
@@ -52,7 +53,14 @@ void cleanGrid(vector<vector<Cell *>> &grid)
     }
   }
 }
-
+void callDFS(vector<vector<Cell>> &grid)
+{
+  auto start = high_resolution_clock::now();
+  dfs(grid, 0, 0);
+  auto stop = high_resolution_clock::now();
+  auto duration = duration_cast<microseconds>(stop - start);
+  cout << "dfs done in " << duration.count() << "e-6 seconds" << endl;
+}
 int main()
 {
   srand(time(nullptr)); // seed randomizer
@@ -81,24 +89,27 @@ int main()
   auto duration = duration_cast<milliseconds>(stop - start);
   cout << "prim maze generated in " << duration.count() << endl;
 
-  // start = high_resolution_clock::now();
-  // recursiveBacktracking(rBGrid, 0, 0);
-  // stop = high_resolution_clock::now();
-  // duration = duration_cast<milliseconds>(stop - start);
-
-  // cout << "recursiveBacktracking maze generated in " << duration.count() << endl;
-
   primGrid[0][0].start = true;
   primGrid[m - 1][n - 1].end = true;
   rBGrid[0][0].start = true;
   rBGrid[m - 1][n - 1].end = true;
 
-  start = high_resolution_clock::now();
-  dfs(primGrid, 0, 0);
-  stop = high_resolution_clock::now();
-  duration = duration_cast<milliseconds>(stop - start);
-  cout << "dfs done in " << duration.count() << endl;
+  callDFS(primGrid);
 
-  cout << "done";
+  cout << "done \n\n";
+
+  while (true)
+  {
+    cout << "Wanna go again?" << endl
+         << "select algorithm:" << endl;
+    cout << "1 - DFS" << endl;
+    cout << "0 - terminate" << endl;
+    int algoInt;
+    cin >> algoInt;
+    if (algoInt == 0)
+      return 0;
+    else if (algoInt == 1)
+      callDFS(primGrid);
+  }
   return 0;
 }
