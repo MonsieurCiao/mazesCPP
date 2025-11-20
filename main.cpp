@@ -1,0 +1,104 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include "prim.h"
+// #include "recursiveBacktracking.h"
+// #include "dfsRecursive.h"
+
+#include <stack>
+
+using namespace std;
+using namespace std::chrono;
+
+void dfs(vector<vector<Cell>> &grid, int i, int j)
+{
+  stack<Cell *> stack;
+  stack.push(&grid[i][j]);
+  while (!stack.empty())
+  {
+    Cell *cur = stack.top();
+
+    if (cur->end)
+    {
+      return;
+    }
+    if (!cur->neighbors.empty())
+    {
+      int index = rand() % cur->neighbors.size();
+      i = cur->neighbors[index]->i;
+      j = cur->neighbors[index]->j;
+      stack.push(cur->neighbors[index]);
+      cur->neighbors.erase(cur->neighbors.begin() + index);
+    }
+    else
+    {
+      stack.pop();
+      if (stack.empty())
+        return;
+      cur = stack.top();
+    }
+  }
+  return;
+}
+
+void cleanGrid(vector<vector<Cell *>> &grid)
+{
+  for (int i = 0; i < grid.size(); i++)
+  {
+    for (int j = 0; j < grid[0].size(); j++)
+    {
+      grid[i][j]->visited = false;
+    }
+  }
+}
+
+int main()
+{
+  srand(time(nullptr)); // seed randomizer
+  int m = 1000;
+  int n = 1000;
+  vector<vector<Cell>> primGrid(m, vector<Cell>(n));
+  vector<vector<Cell>> rBGrid(m, vector<Cell>(n));
+
+  for (int i = 0; i < m; i++)
+  {
+    for (int j = 0; j < n; j++)
+    {
+      primGrid[i][j].i = i;
+      primGrid[i][j].j = j;
+      rBGrid[i][j].i = i;
+      rBGrid[i][j].j = j;
+      // std::cout << primGrid[i][j].i << primGrid[i][j].j << " ";
+    }
+    // std::cout << endl;
+  }
+
+  cout << "starting generation..." << endl;
+  auto start = high_resolution_clock::now();
+  prim(primGrid);
+  auto stop = high_resolution_clock::now();
+  auto duration = duration_cast<milliseconds>(stop - start);
+  cout << "prim maze generated in " << duration.count() << endl;
+
+  // start = high_resolution_clock::now();
+  // recursiveBacktracking(rBGrid, 0, 0);
+  // stop = high_resolution_clock::now();
+  // duration = duration_cast<milliseconds>(stop - start);
+
+  // cout << "recursiveBacktracking maze generated in " << duration.count() << endl;
+
+  primGrid[0][0].start = true;
+  primGrid[m - 1][n - 1].end = true;
+  rBGrid[0][0].start = true;
+  rBGrid[m - 1][n - 1].end = true;
+
+  start = high_resolution_clock::now();
+  dfs(primGrid, 0, 0);
+  stop = high_resolution_clock::now();
+  duration = duration_cast<milliseconds>(stop - start);
+  cout << "dfs done in " << duration.count() << endl;
+
+  cout << "done";
+  return 0;
+}
