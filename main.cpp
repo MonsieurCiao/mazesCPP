@@ -4,6 +4,7 @@
 #include <ctime>
 #include <chrono>
 #include "prim.h"
+#include "dfs.h"
 // #include "recursiveBacktracking.h"
 // #include "dfsRecursive.h"
 
@@ -12,47 +13,6 @@
 using namespace std;
 using namespace std::chrono;
 
-void dfs(vector<vector<Cell>> &grid, int i, int j)
-{
-  stack<Cell *> stack;
-  stack.push(&grid[i][j]);
-  while (!stack.empty())
-  {
-    Cell *cur = stack.top();
-
-    if (cur->end)
-    {
-      return;
-    }
-    if (!cur->neighbors.empty())
-    {
-      int index = rand() % cur->neighbors.size();
-      i = cur->neighbors[index]->i;
-      j = cur->neighbors[index]->j;
-      stack.push(cur->neighbors[index]);
-      cur->neighbors.erase(cur->neighbors.begin() + index);
-    }
-    else
-    {
-      stack.pop();
-      if (stack.empty())
-        return;
-      cur = stack.top();
-    }
-  }
-  return;
-}
-
-void cleanGrid(vector<vector<Cell *>> &grid)
-{
-  for (int i = 0; i < grid.size(); i++)
-  {
-    for (int j = 0; j < grid[0].size(); j++)
-    {
-      grid[i][j]->visited = false;
-    }
-  }
-}
 void callDFS(vector<vector<Cell>> &grid)
 {
   auto start = high_resolution_clock::now();
@@ -112,4 +72,15 @@ int main()
       callDFS(primGrid);
   }
   return 0;
+}
+
+void cleanGrid(vector<vector<Cell *>> &grid)
+{
+  for (int i = 0; i < grid.size(); i++)
+  {
+    for (int j = 0; j < grid[0].size(); j++)
+    {
+      grid[i][j]->visited = false;
+    }
+  }
 }
